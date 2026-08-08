@@ -23,6 +23,7 @@ final class DashboardController extends AbstractController
         return $this->render('dashboard/index.html.twig', [
             'proposals' => $bookings->proposedFor($user),
             'upcoming' => $bookings->upcomingFor($user),
+            'declined' => $bookings->declinedFor($user),
         ]);
     }
 }

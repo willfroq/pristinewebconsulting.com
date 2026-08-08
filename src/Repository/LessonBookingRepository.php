@@ -61,6 +61,19 @@ final class LessonBookingRepository extends ServiceEntityRepository
     }
 
     /** @return list<LessonBooking> */
+    public function declinedFor(User $user): array
+    {
+        return $this->createQueryBuilder('b')
+            ->andWhere('b.student = :user')
+            ->andWhere('b.status = :status')
+            ->setParameter('user', $user)
+            ->setParameter('status', 'declined')
+            ->orderBy('b.startsAt', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /** @return list<LessonBooking> */
     public function pendingProposals(): array
     {
         return $this->createQueryBuilder('b')
@@ -80,8 +93,10 @@ final class LessonBookingRepository extends ServiceEntityRepository
         $end = $day->modify('+1 day')->setTimezone($utc);
         $bookings = $this->createQueryBuilder('b')
             ->andWhere('b.startsAt >= :start AND b.startsAt < :end')
+            ->andWhere('b.status IN (:statuses)')
             ->setParameter('start', $start)
             ->setParameter('end', $end)
+            ->setParameter('statuses', ['proposed', 'approved'])
             ->getQuery()
             ->getResult();
 

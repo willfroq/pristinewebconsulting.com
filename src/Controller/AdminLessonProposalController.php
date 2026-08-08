@@ -62,9 +62,9 @@ final class AdminLessonProposalController extends AbstractController
         }
         if ($proposal->isProposed()) {
             $proposal->getStudent()->grantLessonCredit();
-            $entityManager->remove($proposal);
+            $proposal->decline();
             $entityManager->flush();
-            $this->addFlash('success', 'Proposal declined. The learner’s lesson credit was returned.');
+            $this->addFlash('success', 'Proposal declined. The learner’s lesson credit was returned and the update is visible on their dashboard.');
         }
 
         return $this->redirectToRoute('app_admin_lesson_proposals');

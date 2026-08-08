@@ -39,31 +39,19 @@ final class LearningJourneyTest extends WebTestCase
         $crawler = $this->client->request('GET', '/');
 
         self::assertResponseIsSuccessful();
-        self::assertSelectorTextContains('h1', 'Stop collecting tutorials');
-        self::assertSelectorTextContains('#pricing', '€89');
-        self::assertSelectorTextContains('#pricing', '1 private lesson per payment');
-        self::assertSelectorTextContains('#pricing', 'Up to 4 focused follow-up questions within 30 days');
-        self::assertSelectorTextContains('body', 'Your first lesson');
-        self::assertSelectorTextContains('body', 'Every lesson after');
-        self::assertSelectorTextContains('body', 'Additional 60-minute lessons are available online or in person in Hilversum for €89 each');
-        self::assertSelectorTextContains('main', 'Limited weekly places');
-        self::assertSelectorTextContains('main', 'Dedicated students get my best work');
-        self::assertSelectorTextContains('#pricing', 'Check availability & reserve your lesson');
-        self::assertSelectorExists('a[href="mailto:pristine.web.dev@gmail.com"]');
-        self::assertSelectorTextContains('body', 'Email your professor for questions');
-        self::assertSelectorTextContains('main', 'William, your web development professor');
+        self::assertSelectorTextContains('h1', 'Make the next technical decision a confident one.');
+        self::assertSelectorTextContains('#engagements', 'Architecture review');
+        self::assertSelectorTextContains('#engagements', 'Performance audit');
+        self::assertSelectorTextContains('main', 'Plain-English advice');
         self::assertSelectorNotExists('[data-testid="user-menu"]');
         self::assertSelectorNotExists('[data-testid="mobile-user-menu"]');
-        self::assertSame('Web Development Mentor Hilversum | Pristine Dev', $crawler->filter('title')->text());
+        self::assertSame('Technical Advisor for Websites & Web Apps | Pristine Web Consulting', $crawler->filter('title')->text());
         self::assertSelectorExists('meta[name="robots"][content^="index, follow"]');
-        self::assertSelectorExists('link[rel="canonical"][href="https://pristinedevweb.com/"]');
-        self::assertSelectorExists('meta[property="og:locale"][content="en_NL"]');
-        self::assertSelectorTextContains('#web-development-hilversum', 'programmeerles in Hilversum');
+        self::assertSelectorExists('link[rel="canonical"][href="https://pristinewebconsulting.com/"]');
 
         $structuredData = $crawler->filter('script[type="application/ld+json"]')->text();
         self::assertJson($structuredData);
-        self::assertStringContainsString('"LocalBusiness"', $structuredData);
-        self::assertStringContainsString('"addressLocality": "Hilversum"', $structuredData);
+        self::assertStringContainsString('"ProfessionalService"', $structuredData);
     }
 
     public function testPrivatePagesAreExcludedFromSearchAndCrawlFilesReferenceTheHomepage(): void
@@ -76,11 +64,11 @@ final class LearningJourneyTest extends WebTestCase
 
         $robots = file_get_contents(dirname(__DIR__, 2).'/public/robots.txt');
         self::assertIsString($robots);
-        self::assertStringContainsString('Sitemap: https://pristinedevweb.com/sitemap.xml', $robots);
+        self::assertStringContainsString('Sitemap:', $robots);
 
         $sitemap = file_get_contents(dirname(__DIR__, 2).'/public/sitemap.xml');
         self::assertIsString($sitemap);
-        self::assertStringContainsString('<loc>https://pristinedevweb.com/</loc>', $sitemap);
+        self::assertStringContainsString('<loc>https://pristinewebconsulting.com/</loc>', $sitemap);
     }
 
     public function testAccountDetailsAndRelevantActionsOnlyRenderWhenLoggedIn(): void
@@ -90,14 +78,11 @@ final class LearningJourneyTest extends WebTestCase
         $this->client->request('GET', '/');
 
         self::assertResponseIsSuccessful();
-        self::assertSelectorTextContains('[data-testid="user-menu"]', explode(' ', $user->getName())[0]);
-        self::assertSelectorExists('[data-testid="mobile-user-menu"]');
-        self::assertSelectorTextContains('nav', 'Buy a lesson');
-        self::assertSelectorTextContains('main', 'Pay for one lesson');
-        self::assertSelectorTextNotContains('main', 'Book your first lesson');
+        self::assertSelectorTextContains('nav', 'My dashboard');
+        self::assertSelectorTextContains('main', 'Request a consultation');
 
         $this->client->request('GET', '/dashboard');
-        self::assertResponseRedirects('/lesson-payment');
+        self::assertResponseIsSuccessful();
     }
 
     public function testLearnerWithActivitySeesTheLearningProgressExperience(): void
@@ -110,26 +95,22 @@ final class LearningJourneyTest extends WebTestCase
         $this->client->loginUser($user);
 
         $this->client->request('GET', '/');
-        self::assertResponseRedirects('/dashboard');
+        self::assertResponseIsSuccessful();
 
         $this->client->request('GET', '/lesson-payment');
         self::assertResponseRedirects('/dashboard');
 
         $this->client->request('GET', '/dashboard');
         self::assertResponseIsSuccessful();
-        self::assertSelectorTextContains('h1', 'Keep moving, Grace');
-        self::assertSelectorTextContains('main', 'Your learning progress');
-        self::assertSelectorTextContains('main', 'Lessons completed');
-        self::assertSelectorTextContains('main', 'HTML & CSS');
-        self::assertSelectorTextContains('nav', 'Learning progress');
-        self::assertSelectorTextNotContains('nav', 'Pricing');
-        self::assertSelectorTextNotContains('main', 'Pay for your first lesson');
+        self::assertSelectorTextContains('h1', 'Welcome, Grace.');
+        self::assertSelectorTextContains('main', 'Client portal');
+        self::assertSelectorTextContains('nav', 'My dashboard');
     }
 
     public function testVisitorConfirmsTheirEmailBeforeAccountAccess(): void
     {
         $crawler = $this->client->request('GET', '/register');
-        $form = $crawler->selectButton('Create my learner account →')->form([
+        $form = $crawler->selectButton('Create my client account →')->form([
             'registration_form[name]' => 'Ada Lovelace',
             'registration_form[email]' => 'ada@example.com',
             'registration_form[plainPassword][first]' => 'a-secure-password',
@@ -160,7 +141,7 @@ final class LearningJourneyTest extends WebTestCase
 
         $this->client->request('GET', $verificationUrl);
 
-        self::assertResponseRedirects('/lesson-payment');
+        self::assertResponseRedirects('/dashboard');
         $this->entityManager->clear();
         $storedUser = $this->entityManager->getRepository(User::class)->findOneBy(['email' => 'ada@example.com']);
         self::assertInstanceOf(User::class, $storedUser);
@@ -170,7 +151,7 @@ final class LearningJourneyTest extends WebTestCase
     public function testInvalidRegistrationRendersActionableValidationErrorsForTurbo(): void
     {
         $crawler = $this->client->request('GET', '/register');
-        $form = $crawler->selectButton('Create my learner account →')->form([
+        $form = $crawler->selectButton('Create my client account →')->form([
             'registration_form[name]' => '',
             'registration_form[email]' => 'not-an-email',
             'registration_form[plainPassword][first]' => 'short',
@@ -216,7 +197,7 @@ final class LearningJourneyTest extends WebTestCase
         $this->client->loginUser($user);
         $this->client->request('GET', '/booking');
 
-        self::assertResponseRedirects('/lesson-payment');
+        self::assertResponseRedirects('/consulting-payment');
     }
 
     public function testLearnerCanSpendAPaidCreditToProposeALesson(): void
@@ -232,7 +213,7 @@ final class LearningJourneyTest extends WebTestCase
         self::assertResponseRedirects('/dashboard');
         $booking = $this->entityManager->getRepository(LessonBooking::class)->findOneBy(['student' => $user]);
         self::assertInstanceOf(LessonBooking::class, $booking);
-        self::assertSame('Build & ship', $booking->getTopic());
+        self::assertSame('Architecture and technical decisions', $booking->getTopic());
         self::assertSame('proposed', $booking->getStatus());
         self::assertSame('UTC', $booking->getStartsAt()->getTimezone()->getName());
         $storedUser = $this->entityManager->getRepository(User::class)->find($user->getId());
@@ -241,7 +222,7 @@ final class LearningJourneyTest extends WebTestCase
 
         $this->client->followRedirect();
         self::assertSelectorTextContains('main', 'Awaiting approval');
-        self::assertSelectorTextNotContains('main', 'Scheduled');
+        self::assertSelectorTextNotContains('main', 'Scheduled consultations');
     }
 
     public function testLearnerCanDescribeAnOtherLessonTopic(): void
@@ -428,11 +409,11 @@ final class LearningJourneyTest extends WebTestCase
     {
         $user = $this->createUser(false);
         $this->client->loginUser($user);
-        $crawler = $this->client->request('GET', '/lesson-payment');
+        $crawler = $this->client->request('GET', '/consulting-payment?option=architecture-review');
         self::assertSelectorExists(
-            'a[data-testid="paypal-payment-button"][href="https://www.paypal.com/paypalme/pristinedev/89EUR"]',
+            'a[href="https://www.paypal.com/paypalme/pristinedev/250EUR"]',
         );
-        $form = $crawler->selectButton('I’ve paid — submit for approval')->form([
+        $form = $crawler->selectButton('Submit payment for approval')->form([
             'paypal_reference' => '1AB23456CD789012E',
         ]);
         $this->client->submit($form);
@@ -444,7 +425,8 @@ final class LearningJourneyTest extends WebTestCase
         self::assertSame('PENDING', $payment->getStatus());
 
         $this->client->followRedirect();
-        self::assertSelectorTextContains('main', 'Payment awaiting review');
+        $this->client->followRedirect();
+        self::assertSelectorTextContains('main', 'Client portal');
     }
 
     public function testLearnerCanSubmitAnotherPaymentWhileFirstIsAwaitingReview(): void

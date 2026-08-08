@@ -84,4 +84,13 @@ class LessonBooking
 
         $this->status = 'approved';
     }
+
+    public function decline(): void
+    {
+        if (!$this->isProposed()) {
+            throw new \LogicException('Only a proposed lesson can be declined.');
+        }
+
+        $this->status = 'declined';
+    }
 }
