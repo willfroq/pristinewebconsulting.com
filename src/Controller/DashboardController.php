@@ -19,6 +19,7 @@ final class DashboardController extends AbstractController
         if (!$user instanceof User) {
             throw $this->createAccessDeniedException();
         }
+
         return $this->render('dashboard/index.html.twig', [
             'proposals' => $bookings->proposedFor($user),
             'upcoming' => $bookings->upcomingFor($user),
