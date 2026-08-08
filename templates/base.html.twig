@@ -3,72 +3,273 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="{% block meta_description %}Independent technical advice for websites, web applications, performance and cloud infrastructure.{% endblock %}">
+
+    {# SEO #}
+    <meta name="description" content="{% block meta_description %}Independent PHP, Symfony and AWS consulting for businesses. Get technical architecture reviews, performance audits and independent advice before committing to expensive web application changes.{% endblock %}">
     <meta name="robots" content="{% block robots %}index, follow{% endblock %}">
-    <title>{% block title %}Pristine Web Consulting{% endblock %}</title>
-    {% block canonical %}{% endblock %}
-    {% block social_meta %}{% endblock %}
-    {% block structured_data %}{% endblock %}
+    <meta name="author" content="Pristine Web Consulting">
+    <meta name="theme-color" content="#111111">
+
+    <title>{% block title %}PHP, Symfony & AWS Consulting | Pristine Web Consulting{% endblock %}</title>
+
+    {# Canonical URL #}
+    {% block canonical %}
+        <link rel="canonical" href="{{ app.request.schemeAndHttpHost ~ app.request.pathInfo }}">
+    {% endblock %}
+
+    {# Open Graph / Social Sharing #}
+    {% block social_meta %}
+        <meta property="og:type" content="website">
+        <meta property="og:site_name" content="Pristine Web Consulting">
+        <meta property="og:title" content="{% block og_title %}PHP, Symfony & AWS Consulting | Pristine Web Consulting{% endblock %}">
+        <meta property="og:description" content="{% block og_description %}Independent technical consulting for PHP, Symfony and AWS applications. Architecture reviews, performance audits and technical second opinions.{% endblock %}">
+        <meta property="og:url" content="{{ app.request.schemeAndHttpHost ~ app.request.pathInfo }}">
+        <meta property="og:locale" content="en_US">
+
+        {% block og_image %}
+            <meta property="og:image" content="{{ app.request.schemeAndHttpHost }}/images/og-image.jpg">
+            <meta property="og:image:alt" content="Pristine Web Consulting - PHP, Symfony and AWS technical consulting">
+        {% endblock %}
+
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:title" content="{% block twitter_title %}PHP, Symfony & AWS Consulting | Pristine Web Consulting{% endblock %}">
+        <meta name="twitter:description" content="{% block twitter_description %}Independent technical consulting for PHP, Symfony and AWS applications.{% endblock %}">
+        <meta name="twitter:image" content="{{ app.request.schemeAndHttpHost }}/images/og-image.jpg">
+    {% endblock %}
+
+    {# Structured data #}
+    {% block structured_data %}
+        <script type="application/ld+json">
+            {
+                "@context": "https://schema.org",
+                "@type": "ProfessionalService",
+                "name": "Pristine Web Consulting",
+                "url": "{{ app.request.schemeAndHttpHost }}",
+            "description": "Independent PHP, Symfony and AWS technical consulting for businesses, including architecture reviews, performance audits and web application assessments.",
+            "areaServed": [
+                {
+                    "@type": "Country",
+                    "name": "Netherlands"
+                },
+                {
+                    "@type": "Place",
+                    "name": "Hilversum"
+                }
+            ],
+            "serviceType": [
+                "PHP Consulting",
+                "Symfony Consulting",
+                "AWS Consulting",
+                "Web Application Audit",
+                "Software Architecture Review",
+                "Web Application Performance Audit",
+                "Cloud Infrastructure Consulting",
+                "Technical Due Diligence"
+            ],
+            "priceRange": "€€",
+            "sameAs": []
+        }
+        </script>
+
+        <script type="application/ld+json">
+            {
+                "@context": "https://schema.org",
+                "@type": "WebSite",
+                "name": "Pristine Web Consulting",
+                "url": "{{ app.request.schemeAndHttpHost }}"
+        }
+        </script>
+    {% endblock %}
+
+    {# Performance #}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
-    {% block javascripts %}{{ importmap('app') }}{% endblock %}
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@600;700&family=Manrope:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    {% block javascripts %}
+        {{ importmap('app') }}
+    {% endblock %}
 </head>
+
 <body class="min-h-screen font-sans antialiased">
-    <nav class="sticky top-0 z-50 border-b border-ink/10 bg-cream/90 backdrop-blur-lg">
-        <div class="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 lg:px-8">
-            <a href="{{ path('app_home') }}" class="flex items-center gap-2.5 font-display text-lg font-bold tracking-tight"><span class="grid size-9 place-items-center rounded-xl bg-ink text-sm text-lime">⌘</span>Pristine Web</a>
-            {% if app.request.attributes.get('_route') not in ['app_login', 'app_register'] %}
-                <div class="hidden items-center gap-7 text-sm font-semibold md:flex">
-                    {% if app.request.attributes.get('_route') == 'app_home' %}
-                        <a href="#services" class="hover:text-coral">Services</a>
-                        <a href="#engagements" class="hover:text-coral">Engagements</a>
-                        <a href="#rates" class="hover:text-coral">Rates</a>
+
+<nav
+    class="sticky top-0 z-50 border-b border-ink/10 bg-cream/90 backdrop-blur-lg"
+    aria-label="Main navigation"
+>
+    <div class="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 lg:px-8">
+
+        <a
+            href="{{ path('app_home') }}"
+            class="flex items-center gap-2.5 font-display text-lg font-bold tracking-tight"
+            aria-label="Pristine Web Consulting home"
+        >
+                <span
+                    class="grid size-9 place-items-center rounded-xl bg-ink text-sm text-lime"
+                    aria-hidden="true"
+                >⌘</span>
+            Pristine Web
+        </a>
+
+        {% if app.request.attributes.get('_route') not in ['app_login', 'app_register'] %}
+
+            <div class="hidden items-center gap-7 text-sm font-semibold md:flex">
+
+                {% if app.request.attributes.get('_route') == 'app_home' %}
+                    <a href="#services" class="hover:text-coral">Services</a>
+                    <a href="#engagements" class="hover:text-coral">Engagements</a>
+                    <a href="#rates" class="hover:text-coral">Rates</a>
+                {% endif %}
+
+                {% if app.user %}
+                    <a href="{{ path('app_dashboard') }}" class="hover:text-coral">
+                        My dashboard
+                    </a>
+
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <a href="{{ path('app_admin_lesson_proposals') }}" class="hover:text-coral">
+                            Schedule proposals
+                        </a>
+
+                        <a href="{{ path('app_admin_payments') }}" class="hover:text-coral">
+                            Payment confirmations
+                        </a>
                     {% endif %}
-                    {% if app.user %}
-                        <a href="{{ path('app_dashboard') }}" class="hover:text-coral">My dashboard</a>
-                        {% if is_granted('ROLE_ADMIN') %}
-                            <a href="{{ path('app_admin_lesson_proposals') }}" class="hover:text-coral">Schedule proposals</a>
-                            <a href="{{ path('app_admin_payments') }}" class="hover:text-coral">Payment confirmations</a>
-                        {% endif %}
-                        <form method="post" action="{{ path('app_logout') }}">
-                            <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">
-                            <button type="submit" class="hover:text-coral">Log out</button>
-                        </form>
-                    {% else %}
-                        <a href="{{ path('app_login') }}" class="hover:text-coral">Login</a>
-                        <a href="{{ path('app_register') }}" class="hover:text-coral">Create account</a>
+
+                    <form method="post" action="{{ path('app_logout') }}">
+                        <input
+                            type="hidden"
+                            name="_csrf_token"
+                            value="{{ csrf_token('logout') }}"
+                        >
+                        <button type="submit" class="hover:text-coral">
+                            Log out
+                        </button>
+                    </form>
+
+                {% else %}
+                    <a href="{{ path('app_login') }}" class="hover:text-coral">
+                        Login
+                    </a>
+
+                    <a href="{{ path('app_register') }}" class="hover:text-coral">
+                        Create account
+                    </a>
+                {% endif %}
+
+                <a
+                    href="{{ path('app_home') }}#contact"
+                    class="rounded-xl bg-ink px-4 py-2.5 text-white transition hover:-translate-y-0.5 hover:bg-coral"
+                >
+                    Book a technical review
+                </a>
+            </div>
+
+            <div class="flex items-center gap-3 md:hidden">
+
+                {% if app.user %}
+
+                    <a
+                        href="{{ path('app_dashboard') }}"
+                        class="text-sm font-bold hover:text-coral"
+                    >
+                        Dashboard
+                    </a>
+
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <a
+                            href="{{ path('app_admin_lesson_proposals') }}"
+                            class="text-sm font-bold hover:text-coral"
+                        >
+                            Proposals
+                        </a>
+
+                        <a
+                            href="{{ path('app_admin_payments') }}"
+                            class="text-sm font-bold hover:text-coral"
+                        >
+                            Payments
+                        </a>
                     {% endif %}
-                    <a href="{{ path('app_home') }}#contact" class="rounded-xl bg-ink px-4 py-2.5 text-white transition hover:-translate-y-0.5 hover:bg-coral">Book a call</a>
-                </div>
-                <div class="flex items-center gap-3 md:hidden">
-                    {% if app.user %}
-                        <a href="{{ path('app_dashboard') }}" class="text-sm font-bold hover:text-coral">Dashboard</a>
-                        {% if is_granted('ROLE_ADMIN') %}
-                            <a href="{{ path('app_admin_lesson_proposals') }}" class="text-sm font-bold hover:text-coral">Proposals</a>
-                            <a href="{{ path('app_admin_payments') }}" class="text-sm font-bold hover:text-coral">Payments</a>
-                        {% endif %}
-                        <form method="post" action="{{ path('app_logout') }}">
-                            <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">
-                            <button type="submit" class="text-sm font-bold hover:text-coral">Log out</button>
-                        </form>
-                    {% else %}
-                        <a href="{{ path('app_register') }}" class="text-sm font-bold hover:text-coral">Sign up</a>
-                    {% endif %}
-                    <a href="{{ path('app_home') }}#contact" class="rounded-xl bg-ink px-4 py-2 text-sm font-bold text-white">Book a call</a>
-                </div>
-            {% endif %}
+
+                    <form method="post" action="{{ path('app_logout') }}">
+                        <input
+                            type="hidden"
+                            name="_csrf_token"
+                            value="{{ csrf_token('logout') }}"
+                        >
+                        <button
+                            type="submit"
+                            class="text-sm font-bold hover:text-coral"
+                        >
+                            Log out
+                        </button>
+                    </form>
+
+                {% else %}
+
+                    <a
+                        href="{{ path('app_register') }}"
+                        class="text-sm font-bold hover:text-coral"
+                    >
+                        Sign up
+                    </a>
+
+                {% endif %}
+
+                <a
+                    href="{{ path('app_home') }}#contact"
+                    class="rounded-xl bg-ink px-4 py-2 text-sm font-bold text-white"
+                >
+                    Book a review
+                </a>
+
+            </div>
+
+        {% endif %}
+    </div>
+</nav>
+
+{% for type, messages in app.flashes %}
+    <div class="mx-auto mt-5 max-w-4xl px-5">
+        {% for message in messages %}
+            <div class="rounded-xl border border-green-200 bg-green-50 p-4 text-sm font-semibold text-green-900">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endfor %}
+
+<main>
+    {% block body %}{% endblock %}
+</main>
+
+<footer class="border-t border-ink/10 bg-ink text-white">
+    <div class="mx-auto flex max-w-7xl flex-col gap-5 px-5 py-10 sm:flex-row sm:items-center sm:justify-between lg:px-8">
+
+        <div>
+            <p class="font-display text-lg font-bold">
+                Pristine Web Consulting
+            </p>
+
+            <p class="mt-1 text-sm text-white/60">
+                Independent PHP, Symfony & AWS technical consulting.
+            </p>
+
+            <p class="mt-1 text-sm text-white/50">
+                Architecture reviews · Performance audits · Cloud infrastructure
+            </p>
         </div>
-    </nav>
-    {% for type, messages in app.flashes %}
-        <div class="mx-auto mt-5 max-w-4xl px-5">{% for message in messages %}<div class="rounded-xl border border-green-200 bg-green-50 p-4 text-sm font-semibold text-green-900">{{ message }}</div>{% endfor %}</div>
-    {% endfor %}
-    <main>{% block body %}{% endblock %}</main>
-    <footer class="border-t border-ink/10 bg-ink text-white">
-        <div class="mx-auto flex max-w-7xl flex-col gap-5 px-5 py-10 sm:flex-row sm:items-center sm:justify-between lg:px-8">
-            <div><p class="font-display text-lg font-bold">Pristine Web Consulting</p><p class="mt-1 text-sm text-white/60">Clear thinking for digital products that need to work.</p></div>
-            <p class="text-sm text-white/50">© {{ 'now'|date('Y') }} · Hilversum & remote</p>
-        </div>
-    </footer>
+
+        <p class="text-sm text-white/50">
+            © {{ 'now'|date('Y') }} · Hilversum & remote
+        </p>
+
+    </div>
+</footer>
+
 </body>
 </html>
