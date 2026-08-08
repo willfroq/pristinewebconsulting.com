@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Schedule a consultation — Pristine Web Consulting{% endblock %}
+
+{% block body %}
+<section class="grid-paper min-h-[76vh] px-5 py-14">
+    <div class="mx-auto max-w-5xl">
+        <a href="{{ path('app_dashboard') }}" class="text-sm font-bold text-ink/60 hover:text-ink">← Back to dashboard</a>
+        <div class="mt-6">
+        <p class="text-sm font-bold uppercase tracking-[.18em] text-coral">Schedule your consultation</p>
+        <h1 class="mt-2 font-display text-4xl font-bold sm:text-5xl">Choose a time to work together.</h1>
+        <p class="mt-4 max-w-2xl text-ink/60">All times are shown in Amsterdam time (CET/CEST). Your chosen time is held while I review it and becomes a scheduled consultation after approval.</p>
+        </div>
+        <div class="mt-9">{{ component('SlotPicker') }}</div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" role="img" aria-labelledby="title">
+  <title id="title">Pristine Dev icon</title>
+  <rect x="8" y="8" width="240" height="240" rx="60" fill="#10231f"/>
+  <path d="M80 82 39 128l41 46M176 82l41 46-41 46M148 62l-40 132" fill="none" stroke="#d8f56f" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

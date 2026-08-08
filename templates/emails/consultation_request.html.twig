@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<body style="margin:0;background:#f8fbff;color:#0b1220;font-family:Arial,sans-serif;">
+    <div style="max-width:640px;margin:0 auto;padding:32px 20px;">
+        <div style="border-radius:24px;background:#0b1220;padding:28px 32px;color:#ffffff;">
+            <p style="margin:0;color:#93c5fd;font-size:12px;font-weight:bold;letter-spacing:1.5px;text-transform:uppercase;">New consultation request</p>
+            <h1 style="margin:12px 0 0;font-size:28px;">{{ request.name }}</h1>
+        </div>
+        <div style="margin-top:16px;border:1px solid #dbeafe;border-radius:24px;background:#ffffff;padding:28px 32px;">
+            <p style="margin:0 0 16px;"><strong>Email:</strong> <a href="mailto:{{ request.email }}" style="color:#2563eb;">{{ request.email }}</a></p>
+            <p style="margin:0 0 24px;"><strong>Website / app:</strong> {{ request.website ?: 'Not provided' }}</p>
+            <p style="margin:0 0 8px;font-weight:bold;">Request</p>
+            <p style="margin:0;white-space:pre-line;line-height:1.6;">{{ request.message }}</p>
+        </div>
+        <p style="margin:24px 0 0;text-align:center;font-size:13px;"><a href="{{ register_url }}" style="color:#2563eb;">Create a client account</a></p>
+    </div>
+</body>
+</html>

@@ -1,0 +1,45 @@
+<div {{ attributes }} class="rounded-[2rem] border border-ink/15 bg-white p-6 soft-shadow sm:p-8">
+    <div class="grid gap-8 lg:grid-cols-[.65fr_1.35fr]">
+        <div>
+            <label for="lesson-date" class="mb-3 block font-display text-lg font-bold">1. Pick a date</label>
+            <select id="lesson-date" data-model="selectedDate" class="field">
+                {% for date in this.dates %}
+                    <option value="{{ date.value }}">{{ date.label }}</option>
+                {% endfor %}
+            </select>
+            <div class="mt-6 rounded-2xl bg-cream p-5">
+                <p class="text-xs font-bold uppercase tracking-wider text-coral">What happens next?</p>
+                <p class="mt-3 text-sm leading-6 text-ink/60">Your choice is submitted as a proposal. I review it first, and only an approved time appears in your scheduled consultations.</p>
+            </div>
+        </div>
+        <div>
+            <h2 class="font-display text-lg font-bold">2. Choose an available time</h2>
+            {% if this.availableTimes is empty %}
+                <p class="mt-4 rounded-xl bg-amber-50 p-4 text-sm text-amber-900">No times remain on this date. Try another day.</p>
+            {% else %}
+                <div class="mt-4 grid gap-3 sm:grid-cols-2">
+                    {% for time in this.availableTimes %}
+                        <form method="post" action="{{ path('app_booking_reserve') }}" class="rounded-2xl border border-ink/15 p-4 hover:border-ink hover:bg-cream">
+                            <input type="hidden" name="_token" value="{{ csrf_token('reserve_lesson') }}">
+                            <input type="hidden" name="date" value="{{ this.selectedDate }}">
+                            <input type="hidden" name="time" value="{{ time }}">
+                            <label class="text-xs font-bold uppercase tracking-wide text-ink/50" for="topic-{{ time|replace({':': '-'}) }}">Consulting focus</label>
+                            <select id="topic-{{ time|replace({':': '-'}) }}" name="topic" class="mt-2 w-full rounded-lg border-0 bg-transparent p-0 text-sm font-semibold focus:ring-0">
+                                <option>Architecture and technical decisions</option>
+                                <option>Website performance</option>
+                                <option>Infrastructure and AWS</option>
+                                <option>Code quality and maintainability</option>
+                                <option value="Other">Other — describe your focus</option>
+                            </select>
+                            <label class="mt-3 block text-xs font-bold uppercase tracking-wide text-ink/50" for="other-topic-{{ time|replace({':': '-'}) }}">If other, describe it</label>
+                            <input id="other-topic-{{ time|replace({':': '-'}) }}" name="other_topic" maxlength="80" placeholder="e.g. testing an API" class="mt-2 w-full rounded-lg border border-ink/15 bg-white px-3 py-2 text-sm focus:border-coral focus:ring-coral">
+                            <button class="mt-4 flex w-full items-center justify-between rounded-xl bg-ink px-4 py-3 font-bold text-white hover:bg-coral">
+                                <span>{{ time }} {{ this.selectedDate|date('T') }}</span><span>Propose →</span>
+                            </button>
+                        </form>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>

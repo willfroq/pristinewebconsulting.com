@@ -1,0 +1,57 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Create your account — Pristine Web Consulting{% endblock %}
+
+{% block body %}
+<section class="grid-paper min-h-[78vh] px-5 py-16">
+    <div class="mx-auto grid max-w-5xl overflow-hidden rounded-[2rem] border border-ink/15 bg-white soft-shadow lg:grid-cols-[.85fr_1.15fr]">
+        <div class="bg-ink p-8 text-white sm:p-10">
+            <span class="inline-block rounded-full bg-lime px-3 py-1 text-xs font-bold uppercase tracking-wider text-ink">Client portal</span>
+            <h1 class="mt-8 font-display text-4xl font-bold leading-tight">Keep your technical engagement in one place.</h1>
+            <p class="mt-5 leading-7 text-white/60">Create a private client account to manage focused consulting sessions, booking details, and the next practical steps.</p>
+            <div class="mt-10 space-y-5 text-sm">
+                <p class="flex gap-3"><span class="text-lime">✓</span> Private dashboard for your consulting engagement</p>
+                <p class="flex gap-3"><span class="text-lime">✓</span> Schedule focused technical sessions</p>
+                <p class="flex gap-3"><span class="text-lime">✓</span> Secure account and payment process</p>
+            </div>
+        </div>
+        <div class="p-8 sm:p-10">
+            <h2 class="font-display text-3xl font-bold">Create your account</h2>
+            <p class="mt-2 text-sm text-ink/55">Already have a client account? <a href="{{ path('app_login') }}" class="font-bold underline">Log in</a></p>
+            {{ form_start(registrationForm, {attr: {class: 'mt-8 space-y-5'}}) }}
+                {% if not registrationForm.vars.valid %}
+                    <div class="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800" role="alert" data-testid="registration-errors">
+                        <p class="font-bold">Please check the highlighted fields.</p>
+                        <div class="form-errors mt-1">{{ form_errors(registrationForm) }}</div>
+                    </div>
+                {% endif %}
+                <div>
+                    {{ form_label(registrationForm.name, 'Your name', {label_attr: {class: 'mb-2 block text-sm font-bold'}}) }}
+                    {{ form_widget(registrationForm.name, {attr: {class: 'field', autocomplete: 'name', placeholder: 'Ada Lovelace'}}) }}
+                    <div class="form-errors">{{ form_errors(registrationForm.name) }}</div>
+                </div>
+                <div>
+                    {{ form_label(registrationForm.email, 'Email address', {label_attr: {class: 'mb-2 block text-sm font-bold'}}) }}
+                    {{ form_widget(registrationForm.email, {attr: {class: 'field', autocomplete: 'email', placeholder: 'ada@example.com'}}) }}
+                    <div class="form-errors">{{ form_errors(registrationForm.email) }}</div>
+                </div>
+                <div class="grid gap-4 sm:grid-cols-2">
+                    <div>
+                        {{ form_label(registrationForm.plainPassword.first, null, {label_attr: {class: 'mb-2 block text-sm font-bold'}}) }}
+                        {{ form_widget(registrationForm.plainPassword.first, {attr: {class: 'field', autocomplete: 'new-password'}}) }}
+                        <div class="form-errors">{{ form_errors(registrationForm.plainPassword.first) }}</div>
+                    </div>
+                    <div>
+                        {{ form_label(registrationForm.plainPassword.second, null, {label_attr: {class: 'mb-2 block text-sm font-bold'}}) }}
+                        {{ form_widget(registrationForm.plainPassword.second, {attr: {class: 'field', autocomplete: 'new-password'}}) }}
+                        <div class="form-errors">{{ form_errors(registrationForm.plainPassword.second) }}</div>
+                    </div>
+                    <div class="form-errors sm:col-span-2">{{ form_errors(registrationForm.plainPassword) }}</div>
+                </div>
+                <button type="submit" data-turbo-submits-with="Creating your account…" class="w-full rounded-2xl bg-coral px-6 py-4 font-bold text-white transition hover:-translate-y-0.5 hover:bg-ink disabled:cursor-wait disabled:opacity-70">Create my client account →</button>
+                <p class="text-center text-xs leading-5 text-ink/45">By creating an account, you agree to use this portal for professional consulting engagements.</p>
+            {{ form_end(registrationForm) }}
+        </div>
+    </div>
+</section>
+{% endblock %}

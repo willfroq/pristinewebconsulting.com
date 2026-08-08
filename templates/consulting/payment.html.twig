@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Consulting options and payment — Pristine Web Consulting{% endblock %}
+
+{% block body %}
+<section class="grid-paper min-h-[76vh] px-5 py-14">
+    <div class="mx-auto max-w-6xl">
+        <a href="{{ path('app_dashboard') }}" class="text-sm font-bold text-ink/60 hover:text-ink">← Back to client portal</a>
+        <div class="mt-7 max-w-3xl">
+            <p class="text-sm font-bold uppercase tracking-[.18em] text-coral">Consulting options</p>
+            <h1 class="mt-2 font-display text-4xl font-bold sm:text-5xl">Choose the right level of support.</h1>
+            <p class="mt-4 leading-7 text-ink/60">Select the engagement that best matches your situation. The displayed price is an estimate; the final fee depends on the estimated workload.</p>
+        </div>
+
+        <div class="mt-10 grid gap-5 md:grid-cols-2">
+            {% for slug, option in options %}
+                <a href="{{ path('app_consulting_payment', {option: slug}) }}#payment" class="rounded-3xl border p-7 transition hover:-translate-y-1 hover:shadow-lg {{ selected_slug == slug ? 'border-coral bg-blue-50' : 'border-ink/15 bg-white' }}">
+                    <p class="font-display text-2xl font-bold">{{ option.title }}</p>
+                    <p class="mt-4 font-display text-3xl font-bold text-coral">{{ option.price }}</p>
+                    <p class="mt-4 text-sm leading-6 text-ink/60">{{ option.description }}</p>
+                    <span class="mt-6 inline-block text-sm font-bold text-coral">{{ selected_slug == slug ? 'Selected' : 'Select this option' }} →</span>
+                </a>
+            {% endfor %}
+        </div>
+
+        {% if selected_option %}
+            <div id="payment" class="mt-8 scroll-mt-24 rounded-3xl bg-ink p-7 text-white sm:p-9">
+                <p class="text-xs font-bold uppercase tracking-[.16em] text-lime">Selected engagement</p>
+                <h2 class="mt-3 font-display text-2xl font-bold">{{ selected_option.title }} · {{ selected_option.price }}</h2>
+                <p class="mt-3 max-w-2xl leading-7 text-white/65">The PayPal link below is generated for the displayed estimate of {{ selected_option.price }}. I’ll confirm the final scope and workload with you before the work begins.</p>
+                {% if paypal_payment_url %}
+                    <a href="{{ paypal_payment_url }}" target="_blank" rel="noopener" class="mt-6 inline-block rounded-2xl bg-coral px-6 py-3.5 font-bold text-white hover:bg-white hover:text-ink">Continue to PayPal →</a>
+                {% else %}
+                    <p class="mt-6 rounded-xl bg-white/10 p-4 text-sm text-white/75">The PayPal payment link is not configured yet. Please contact me to arrange payment.</p>
+                {% endif %}
+                <form method="post" action="{{ path('app_payment_confirm') }}" class="mt-7 rounded-2xl border border-white/15 bg-white/10 p-5">
+                    <input type="hidden" name="_token" value="{{ csrf_token('confirm_lesson_payment') }}">
+                    <label for="paypal_reference" class="block text-sm font-bold">Already paid? Submit your PayPal transaction ID</label>
+                    <p class="mt-1 text-xs leading-5 text-white/55">I’ll verify it manually. Each approved payment adds one consultation credit, and you can submit another payment while this one is under review.</p>
+                    <input id="paypal_reference" name="paypal_reference" required minlength="6" maxlength="40" autocomplete="off" class="mt-4 block w-full rounded-xl border-0 bg-white px-4 py-3 uppercase text-ink focus:border-coral focus:ring-coral" placeholder="Example: 1AB23456CD789012E">
+                    <button type="submit" class="mt-4 w-full rounded-xl bg-white px-5 py-3 font-bold text-ink hover:bg-blue-100">Submit payment for approval</button>
+                </form>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

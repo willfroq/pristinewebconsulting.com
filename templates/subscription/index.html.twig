@@ -1,0 +1,89 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Payment confirmations — Pristine Web Consulting{% endblock %}
+
+{% block body %}
+{% if admin_payments|default(false) %}
+<section class="grid-paper min-h-[76vh] px-5 py-14">
+    <div class="mx-auto max-w-5xl">
+        <p class="text-sm font-bold uppercase tracking-[.18em] text-coral">Consulting workspace</p>
+        <h1 class="mt-2 font-display text-4xl font-bold sm:text-5xl">Payment confirmations</h1>
+        <p class="mt-3 text-ink/60">Check the transaction ID in your PayPal activity before approving. Approval unlocks consultation scheduling for the client.</p>
+
+        {% if payments is empty %}
+            <div class="mt-10 rounded-[2rem] border border-dashed border-ink/20 bg-white p-10 text-center">
+                <h2 class="font-display text-xl font-bold">No payments waiting</h2>
+                <p class="mt-2 text-sm text-ink/55">Client payment confirmations will appear here.</p>
+            </div>
+        {% else %}
+            <div class="mt-10 space-y-4">
+                {% for payment in payments %}
+                    <article class="rounded-3xl border border-ink/15 bg-white p-6 sm:flex sm:items-center sm:justify-between sm:gap-8">
+                        <div>
+                            <p class="text-xs font-bold uppercase tracking-[.15em] text-coral">{{ payment.student.name }} · {{ payment.student.email }}</p>
+                            <h2 class="mt-2 font-display text-xl font-bold">€{{ (payment.amountCents / 100)|number_format(2) }} {{ payment.currency }}</h2>
+                            <p class="mt-2 text-sm text-ink/60">PayPal transaction ID: <b class="text-ink">{{ payment.paypalReference }}</b></p>
+                            <p class="mt-1 text-xs text-ink/45">Submitted {{ payment.createdAt|date('d M Y · H:i') }}</p>
+                        </div>
+                        <div class="mt-5 flex gap-3 sm:mt-0">
+                            <form method="post" action="{{ path('app_admin_payment_decline', {id: payment.id}) }}">
+                                <input type="hidden" name="_token" value="{{ csrf_token('decline_payment_' ~ payment.id) }}">
+                                <button class="rounded-xl border border-ink/20 px-5 py-3 text-sm font-bold hover:bg-cream">Decline</button>
+                            </form>
+                            <form method="post" action="{{ path('app_admin_payment_approve', {id: payment.id}) }}">
+                                <input type="hidden" name="_token" value="{{ csrf_token('approve_payment_' ~ payment.id) }}">
+                                <button class="rounded-xl bg-ink px-5 py-3 text-sm font-bold text-white hover:bg-coral">Approve payment</button>
+                            </form>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% else %}
+<section class="grid-paper min-h-[76vh] px-5 py-20">
+    <div class="mx-auto max-w-xl rounded-[2rem] border border-ink/15 bg-white p-8 text-center soft-shadow sm:p-12">
+        <span class="inline-block rounded-full bg-lime px-3 py-1 text-xs font-bold uppercase tracking-wider">One-time payment</span>
+        <h1 class="mt-6 font-display text-4xl font-bold">One private web development lesson</h1>
+        <p class="mt-5"><span class="font-display text-6xl font-bold">€89</span><span class="text-ink/45"> once</span></p>
+        <p class="mx-auto mt-5 max-w-md leading-7 text-ink/60">Transfer €89 through PayPal. After you submit the transaction ID, I’ll verify the payment and unlock your lesson dashboard.</p>
+
+        <div class="mt-7 rounded-2xl bg-cream p-5 text-left text-sm leading-6 text-ink/65">
+            <p><b class="text-ink">Included:</b> personal preparation, one live 60-minute lesson, practical next steps, and up to four short follow-up questions within 30 days.</p>
+            <p class="mt-2 font-bold text-ink">No subscription. No automatic monthly charge.</p>
+        </div>
+
+        {% if pending_payment %}
+            <div class="mt-8 rounded-2xl border border-blue-200 bg-blue-50 p-5 text-left">
+                <p class="font-display text-lg font-bold text-blue-950">Payment awaiting review</p>
+                <p class="mt-2 text-sm leading-6 text-blue-900">Transaction {{ pending_payment.paypalReference }} was submitted. I’ll unlock your dashboard after matching it to the €89 transfer in PayPal.</p>
+            </div>
+        {% elseif paypal_payment_url %}
+            <a
+                href="{{ paypal_payment_url }}"
+                target="_blank"
+                rel="noopener noreferrer"
+                data-testid="paypal-payment-button"
+                class="mt-8 flex w-full cursor-pointer items-center justify-center gap-3 rounded-2xl border-2 border-[#003087] px-6 py-4 text-lg font-bold text-white shadow-lg transition hover:-translate-y-0.5 hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-blue-200"
+                style="background-color: #0070ba; color: #ffffff;"
+            >
+                Pay €89 with PayPal <span aria-hidden="true">↗</span>
+            </a>
+
+            <form method="post" action="{{ path('app_payment_confirm') }}" class="mt-8 rounded-2xl border border-ink/10 bg-cream p-5 text-left">
+                <input type="hidden" name="_token" value="{{ csrf_token('confirm_lesson_payment') }}">
+                <label for="paypal_reference" class="block text-sm font-bold">Already paid? Enter your PayPal transaction ID</label>
+                <p class="mt-1 text-xs leading-5 text-ink/50">Find the transaction ID in your PayPal payment receipt or Activity details.</p>
+                <input id="paypal_reference" name="paypal_reference" required minlength="6" maxlength="40" autocomplete="off" class="mt-4 block w-full rounded-xl border border-ink/20 bg-white px-4 py-3 uppercase focus:border-coral focus:ring-coral" placeholder="Example: 1AB23456CD789012E">
+                <button type="submit" class="mt-4 w-full rounded-xl bg-ink px-5 py-3 font-bold text-white hover:bg-coral">I’ve paid — submit for approval</button>
+            </form>
+        {% else %}
+            <p class="mt-8 rounded-xl bg-amber-50 p-4 text-sm text-amber-900">The PayPal payment link is not configured yet. Set <code>PAYPAL_PAYMENT_URL</code> to your PayPal.Me or PayPal payment link.</p>
+        {% endif %}
+
+        <p class="mt-5 text-xs leading-5 text-ink/45">Payments are checked manually. Dashboard access is not granted until the transaction is verified.</p>
+    </div>
+</section>
+{% endif %}
+{% endblock %}
