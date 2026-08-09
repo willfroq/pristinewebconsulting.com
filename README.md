@@ -22,6 +22,20 @@ symfony server:start
 bin/console asset-map:compile // only prod
 ```
 
+### Generating a website QR code
+
+Generate a PNG QR code for a website URL. By default it is written to `public/images/website-qrcode.png`:
+
+```bash
+php bin/console app:generate-qrcode https://example.com
+```
+
+Use `--output` to choose the PNG path and `--size` to set its dimensions (100–2000 pixels):
+
+```bash
+php bin/console app:generate-qrcode https://example.com --output=public/images/example-qr.png --size=500
+```
+
 Create a PayPal.Me link (or another PayPal payment link) for your receiving account and put the full €89 URL in `.env.local`:
 
 ```dotenv
