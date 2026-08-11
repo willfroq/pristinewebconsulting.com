@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Form\ConsultationRequestType;
+use App\Service\ConsultationContentFilter;
 use App\Service\ConsultationSubmissionLimiter;
+use Random\RandomException;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,10 +21,10 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 final class HomeController extends AbstractController
 {
     /**
-     * @throws TransportExceptionInterface
+     * @throws TransportExceptionInterface|RandomException
      */
     #[Route('/', name: 'app_home')]
-    public function index(Request $request, MailerInterface $mailer, ConsultationSubmissionLimiter $submissionLimiter): Response
+    public function index(Request $request, MailerInterface $mailer, ConsultationContentFilter $contentFilter, ConsultationSubmissionLimiter $submissionLimiter): Response
     {
         $session = $request->getSession();
         $formToken = bin2hex(random_bytes(32));
@@ -46,9 +48,10 @@ final class HomeController extends AbstractController
             }
             $session->set('consultation_form_tokens', $issuedTokens);
 
-            $isHumanSubmission = $form->get('company')->getData() === ''
+            $isHumanSubmission = '' === $form->get('company')->getData()
                 && is_int($issuedAt)
                 && $issuedAt <= $now - 3
+                && !$contentFilter->isAdvertising($data['message'])
                 && $submissionLimiter->allows($request->getClientIp() ?? 'unknown', $data['email']);
 
             if (!$isHumanSubmission) {
