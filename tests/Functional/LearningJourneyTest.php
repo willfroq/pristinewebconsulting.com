@@ -54,6 +54,22 @@ final class LearningJourneyTest extends WebTestCase
         self::assertStringContainsString('"ProfessionalService"', $structuredData);
     }
 
+    public function testConsultationHoneypotSubmissionDoesNotSendEmail(): void
+    {
+        $crawler = $this->client->request('GET', '/');
+        $form = $crawler->selectButton('Request a consultation →')->form([
+            'consultation_request[name]' => 'Spam Bot',
+            'consultation_request[email]' => 'bot@example.com',
+            'consultation_request[message]' => 'This submission should be silently discarded by the honeypot.',
+            'consultation_request[company]' => 'Automated Marketing LLC',
+        ]);
+
+        $this->client->submit($form);
+
+        self::assertResponseRedirects('/#contact');
+        self::assertEmailCount(0);
+    }
+
     public function testPrivatePagesAreExcludedFromSearchAndCrawlFilesReferenceTheHomepage(): void
     {
         $this->client->request('GET', '/login');

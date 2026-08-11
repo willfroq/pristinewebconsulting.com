@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Form\ConsultationRequestType;
+use App\Service\ConsultationSubmissionLimiter;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,14 +22,41 @@ final class HomeController extends AbstractController
      * @throws TransportExceptionInterface
      */
     #[Route('/', name: 'app_home')]
-    public function index(Request $request, MailerInterface $mailer): Response
+    public function index(Request $request, MailerInterface $mailer, ConsultationSubmissionLimiter $submissionLimiter): Response
     {
-        $form = $this->createForm(ConsultationRequestType::class);
+        $session = $request->getSession();
+        $formToken = bin2hex(random_bytes(32));
+        $issuedTokens = $session->get('consultation_form_tokens', []);
+        $issuedTokens = is_array($issuedTokens) ? $issuedTokens : [];
+        $now = time();
+        $issuedTokens = array_filter($issuedTokens, static fn (mixed $issuedAt): bool => is_int($issuedAt) && $issuedAt > $now - 7200);
+        $issuedTokens[$formToken] = $now;
+        $session->set('consultation_form_tokens', $issuedTokens);
+
+        $form = $this->createForm(ConsultationRequestType::class, null, ['form_token' => $formToken]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             /** @var array{name: string, email: string, website: string|null, message: string} $data */
             $data = $form->getData();
+            $submittedToken = $form->get('form_token')->getData();
+            $issuedAt = is_string($submittedToken) ? ($issuedTokens[$submittedToken] ?? null) : null;
+            if (is_string($submittedToken)) {
+                unset($issuedTokens[$submittedToken]);
+            }
+            $session->set('consultation_form_tokens', $issuedTokens);
+
+            $isHumanSubmission = $form->get('company')->getData() === ''
+                && is_int($issuedAt)
+                && $issuedAt <= $now - 3
+                && $submissionLimiter->allows($request->getClientIp() ?? 'unknown', $data['email']);
+
+            if (!$isHumanSubmission) {
+                $this->addFlash('success', 'Thanks—your request is on its way. I’ll reply with the best next step.');
+
+                return $this->redirect($this->generateUrl('app_home').'#contact', Response::HTTP_SEE_OTHER);
+            }
+
             $registerUrl = $this->generateUrl('app_register', [], UrlGeneratorInterface::ABSOLUTE_URL);
 
             $mailer->send((new TemplatedEmail())
